@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /** Runs the Probe chatbot. */
@@ -12,8 +13,7 @@ public class Probe {
     /** Reads and responds to commands until the user enters bye. */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Task[] tasks = new Task[100];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         System.out.println(BANNER);
         System.out.println("Hello! I'm Probe.");
@@ -33,8 +33,8 @@ public class Probe {
             } else if (command.equals("list")) {
                 System.out.println("    ____________________________________________________________");
                 System.out.println("     Here are the tasks in your list:");
-                for (int i = 0; i < taskCount; i++) {
-                    System.out.println("     " + (i + 1) + ". " + tasks[i]);
+                for (int i = 0; i < tasks.size(); i++) {
+                    System.out.println("     " + (i + 1) + ". " + tasks.get(i));
                 }
                 System.out.println("    ____________________________________________________________");
             } else if (command.equals("todo") || command.startsWith("todo ")
@@ -42,27 +42,27 @@ public class Probe {
                     || command.equals("event") || command.startsWith("event ")) {
                 try {
                     Task task = createTask(command);
-                    addTask(tasks, taskCount, task);
-                    taskCount++;
-                    printAddedMessage(task, taskCount);
+                    tasks.add(task);
+                    printAddedMessage(task, tasks.size());
+                } catch (ProbeException e) {
+                    System.out.println(e.getMessage());
+                }
+            } else if (command.startsWith("delete ")) {
+                try {
+                    deleteTask(tasks, command);
                 } catch (ProbeException e) {
                     System.out.println(e.getMessage());
                 }
             } else if (command.startsWith("unmark ")) {
-                updateTask(tasks, taskCount, command, false);
+                updateTask(tasks, tasks.size(), command, false);
             } else if (command.startsWith("mark ")) {
-                updateTask(tasks, taskCount, command, true);
+                updateTask(tasks, tasks.size(), command, true);
             } else {
                 System.out.println("Invalid task type. Use todo, deadline, or event.");
             }
         }
 
         scanner.close();
-    }
-
-    /** Stores a task at the next available position in the task array. */
-    private static void addTask(Task[] tasks, int taskCount, Task task) {
-        tasks[taskCount] = task;
     }
 
     /** Creates the appropriate task subtype or throws for invalid task input. */
@@ -110,7 +110,7 @@ public class Probe {
     }
 
     /** Marks or unmarks a task after validating the requested task number. */
-    private static void updateTask(Task[] tasks, int taskCount,
+    private static void updateTask(ArrayList<Task> tasks, int taskCount,
                                    String command, boolean markAsDone) {
         String[] parts = command.split(" ");
 
@@ -127,7 +127,7 @@ public class Probe {
                 return;
             }
 
-            Task task = tasks[taskNumber - 1];
+            Task task = tasks.get(taskNumber - 1);
 
             System.out.println("    ____________________________________________________________");
             if (markAsDone) {
@@ -143,6 +143,33 @@ public class Probe {
             System.out.println("    ____________________________________________________________");
         } catch (NumberFormatException e) {
             System.out.println("The task number must be a number.");
+        }
+    }
+
+    /** Removes a task after validating its list number. */
+    private static void deleteTask(ArrayList<Task> tasks, String command)
+            throws ProbeException {
+        String[] parts = command.split(" ");
+
+        if (parts.length != 2) {
+            throw new ProbeException("Please provide a task number to delete.");
+        }
+
+        try {
+            int taskNumber = Integer.parseInt(parts[1]);
+
+            if (taskNumber < 1 || taskNumber > tasks.size()) {
+                throw new ProbeException("That task number does not exist.");
+            }
+
+            Task removedTask = tasks.remove(taskNumber - 1);
+            System.out.println("    ____________________________________________________________");
+            System.out.println("     Noted. I've removed this task:");
+            System.out.println("       " + removedTask);
+            System.out.println("     Now you have " + tasks.size() + " tasks in the list.");
+            System.out.println("    ____________________________________________________________");
+        } catch (NumberFormatException e) {
+            throw new ProbeException("The task number must be a number.");
         }
     }
 }
