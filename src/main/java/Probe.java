@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Scanner;
 
 /** Runs the Probe chatbot. */
@@ -13,7 +12,8 @@ public class Probe {
     /** Reads and responds to commands until the user enters bye. */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
+        TaskList tasks = new TaskList();
+        TaskParser parser = new TaskParser();
 
         System.out.println(BANNER);
         System.out.println("Hello! I'm Probe.");
@@ -41,7 +41,7 @@ public class Probe {
                     || command.equals("deadline") || command.startsWith("deadline ")
                     || command.equals("event") || command.startsWith("event ")) {
                 try {
-                    Task task = createTask(command);
+                    Task task = parser.parse(command);
                     tasks.add(task);
                     printAddedMessage(task, tasks.size());
                 } catch (ProbeException e) {
@@ -54,50 +54,15 @@ public class Probe {
                     System.out.println(e.getMessage());
                 }
             } else if (command.startsWith("unmark ")) {
-                updateTask(tasks, tasks.size(), command, false);
+                updateTask(tasks, command, false);
             } else if (command.startsWith("mark ")) {
-                updateTask(tasks, tasks.size(), command, true);
+                updateTask(tasks, command, true);
             } else {
                 System.out.println("Invalid task type. Use todo, deadline, or event.");
             }
         }
 
         scanner.close();
-    }
-
-    /** Creates the appropriate task subtype or throws for invalid task input. */
-    private static Task createTask(String command) throws ProbeException {
-        if (command.startsWith("todo")) {
-            String description = command.substring(4).trim();
-            if (description.isBlank()) {
-                throw new ProbeException("A todo description cannot be empty.");
-            }
-            return new Todo(description);
-        }
-
-        if (command.startsWith("deadline")) {
-            String content = command.substring(8).trim();
-            String[] parts = content.split(" /by ", 2);
-            if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) {
-                throw new ProbeException(
-                        "A deadline must include a description and /by a date or time.");
-            }
-            return new Deadline(parts[0], parts[1]);
-        }
-
-        String content = command.substring(5).trim();
-        String[] parts = content.split(" /from ", 2);
-        if (parts.length != 2 || parts[0].isBlank()) {
-            throw new ProbeException(
-                    "An event must include a description and /from a starting date or time.");
-        }
-
-        String[] times = parts[1].split(" /to ", 2);
-        if (times.length != 2 || times[0].isBlank() || times[1].isBlank()) {
-            throw new ProbeException(
-                    "An event must include /to and an ending date or time.");
-        }
-        return new Event(parts[0], times[0], times[1]);
     }
 
     /** Displays confirmation after adding a task. */
@@ -110,8 +75,7 @@ public class Probe {
     }
 
     /** Marks or unmarks a task after validating the requested task number. */
-    private static void updateTask(ArrayList<Task> tasks, int taskCount,
-                                   String command, boolean markAsDone) {
+    private static void updateTask(TaskList tasks, String command, boolean markAsDone) {
         String[] parts = command.split(" ");
 
         if (parts.length != 2) {
@@ -122,7 +86,7 @@ public class Probe {
         try {
             int taskNumber = Integer.parseInt(parts[1]);
 
-            if (taskNumber < 1 || taskNumber > taskCount) {
+            if (taskNumber < 1 || taskNumber > tasks.size()) {
                 System.out.println("That task number does not exist.");
                 return;
             }
@@ -147,7 +111,7 @@ public class Probe {
     }
 
     /** Removes a task after validating its list number. */
-    private static void deleteTask(ArrayList<Task> tasks, String command)
+    private static void deleteTask(TaskList tasks, String command)
             throws ProbeException {
         String[] parts = command.split(" ");
 
