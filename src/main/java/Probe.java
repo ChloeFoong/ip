@@ -21,9 +21,11 @@ public class Probe {
         System.out.println("____________________________________________________________");
 
         while (true) {
-            String command = scanner.nextLine();
+            String command = scanner.nextLine().trim();
 
-            if (command.equals("bye")) {
+            if (command.isEmpty()) {
+                System.out.println("The command cannot be empty.");
+            } else if (command.equals("bye")) {
                 System.out.println("    ____________________________________________________________");
                 System.out.println("    " + "Bye. Hope to see you again soon!");
                 System.out.println("    ____________________________________________________________");
@@ -35,51 +37,23 @@ public class Probe {
                     System.out.println("     " + (i + 1) + ". " + tasks[i]);
                 }
                 System.out.println("    ____________________________________________________________");
-            } else if (command.startsWith("todo ")) {
-                String description = command.substring(5);
-                addTask(tasks, taskCount, new Todo(description));
-                taskCount++;
-                printAddedMessage(tasks[taskCount - 1], taskCount);
-            } else if (command.startsWith("deadline ")) {
-                String content = command.substring(9);
-                String[] parts = content.split(" /by ", 2);
-
-                if (parts.length == 2) {
-                    addTask(tasks, taskCount, new Deadline(parts[0], parts[1]));
+            } else if (command.equals("todo") || command.startsWith("todo ")
+                    || command.equals("deadline") || command.startsWith("deadline ")
+                    || command.equals("event") || command.startsWith("event ")) {
+                try {
+                    Task task = createTask(command);
+                    addTask(tasks, taskCount, task);
                     taskCount++;
-                    printAddedMessage(tasks[taskCount - 1], taskCount);
-                } else {
-                    System.out.println("A deadline must include /by and a date or time.");
-                }
-            } else if (command.startsWith("event ")) {
-                String content = command.substring(6);
-                String[] parts = content.split(" /from ", 2);
-
-                if (parts.length == 2) {
-                    String[] times = parts[1].split(" /to ", 2);
-
-                    if (times.length == 2) {
-                        addTask(tasks, taskCount,
-                                new Event(parts[0], times[0], times[1]));
-                        taskCount++;
-                        printAddedMessage(tasks[taskCount - 1], taskCount);
-                    } else {
-                        System.out.println("An event must include /to and an ending date or time.");
-                    }
-                } else {
-                    System.out.println("An event must include /from and a starting date or time.");
+                    printAddedMessage(task, taskCount);
+                } catch (ProbeException e) {
+                    System.out.println(e.getMessage());
                 }
             } else if (command.startsWith("unmark ")) {
                 updateTask(tasks, taskCount, command, false);
             } else if (command.startsWith("mark ")) {
                 updateTask(tasks, taskCount, command, true);
             } else {
-                System.out.println("    ____________________________________________________________");
-                Task t = new Task(command);
-                tasks[taskCount] = t;
-                taskCount++;
-                System.out.println("    added: " + command);
-                System.out.println("    ____________________________________________________________");
+                System.out.println("Invalid task type. Use todo, deadline, or event.");
             }
         }
 
@@ -89,6 +63,41 @@ public class Probe {
     /** Stores a task at the next available position in the task array. */
     private static void addTask(Task[] tasks, int taskCount, Task task) {
         tasks[taskCount] = task;
+    }
+
+    /** Creates the appropriate task subtype or throws for invalid task input. */
+    private static Task createTask(String command) throws ProbeException {
+        if (command.startsWith("todo")) {
+            String description = command.substring(4).trim();
+            if (description.isBlank()) {
+                throw new ProbeException("A todo description cannot be empty.");
+            }
+            return new Todo(description);
+        }
+
+        if (command.startsWith("deadline")) {
+            String content = command.substring(8).trim();
+            String[] parts = content.split(" /by ", 2);
+            if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) {
+                throw new ProbeException(
+                        "A deadline must include a description and /by a date or time.");
+            }
+            return new Deadline(parts[0], parts[1]);
+        }
+
+        String content = command.substring(5).trim();
+        String[] parts = content.split(" /from ", 2);
+        if (parts.length != 2 || parts[0].isBlank()) {
+            throw new ProbeException(
+                    "An event must include a description and /from a starting date or time.");
+        }
+
+        String[] times = parts[1].split(" /to ", 2);
+        if (times.length != 2 || times[0].isBlank() || times[1].isBlank()) {
+            throw new ProbeException(
+                    "An event must include /to and an ending date or time.");
+        }
+        return new Event(parts[0], times[0], times[1]);
     }
 
     /** Displays confirmation after adding a task. */
