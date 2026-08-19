@@ -32,11 +32,43 @@ public class Probe {
                 System.out.println("    ____________________________________________________________");
                 System.out.println("     Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    Task t = tasks[i];
-                    System.out.println("     " + (i + 1) + ". [" + t.getStatusIcon() + "] "
-                            + t.getDescription());
+                    System.out.println("     " + (i + 1) + ". " + tasks[i]);
                 }
                 System.out.println("    ____________________________________________________________");
+            } else if (command.startsWith("todo ")) {
+                String description = command.substring(5);
+                addTask(tasks, taskCount, new Todo(description));
+                taskCount++;
+                printAddedMessage(tasks[taskCount - 1], taskCount);
+            } else if (command.startsWith("deadline ")) {
+                String content = command.substring(9);
+                String[] parts = content.split(" /by ", 2);
+
+                if (parts.length == 2) {
+                    addTask(tasks, taskCount, new Deadline(parts[0], parts[1]));
+                    taskCount++;
+                    printAddedMessage(tasks[taskCount - 1], taskCount);
+                } else {
+                    System.out.println("A deadline must include /by and a date or time.");
+                }
+            } else if (command.startsWith("event ")) {
+                String content = command.substring(6);
+                String[] parts = content.split(" /from ", 2);
+
+                if (parts.length == 2) {
+                    String[] times = parts[1].split(" /to ", 2);
+
+                    if (times.length == 2) {
+                        addTask(tasks, taskCount,
+                                new Event(parts[0], times[0], times[1]));
+                        taskCount++;
+                        printAddedMessage(tasks[taskCount - 1], taskCount);
+                    } else {
+                        System.out.println("An event must include /to and an ending date or time.");
+                    }
+                } else {
+                    System.out.println("An event must include /from and a starting date or time.");
+                }
             } else if (command.startsWith("unmark ")) {
                 updateTask(tasks, taskCount, command, false);
             } else if (command.startsWith("mark ")) {
@@ -52,6 +84,20 @@ public class Probe {
         }
 
         scanner.close();
+    }
+
+    /** Stores a task at the next available position in the task array. */
+    private static void addTask(Task[] tasks, int taskCount, Task task) {
+        tasks[taskCount] = task;
+    }
+
+    /** Displays confirmation after adding a task. */
+    private static void printAddedMessage(Task task, int taskCount) {
+        System.out.println("    ____________________________________________________________");
+        System.out.println("     Got it. I've added this task:");
+        System.out.println("       " + task);
+        System.out.println("     Now you have " + taskCount + " tasks in the list.");
+        System.out.println("    ____________________________________________________________");
     }
 
     /** Marks or unmarks a task after validating the requested task number. */
