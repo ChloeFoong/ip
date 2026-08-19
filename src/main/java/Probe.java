@@ -12,6 +12,8 @@ public class Probe {
     /** Reads and responds to commands until the user enters bye. */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        String[] tasks = new String[100];
+        int taskCount = 0;
 
         System.out.println(BANNER);
         System.out.println("Hello! I'm Probe.");
@@ -26,11 +28,19 @@ public class Probe {
                 System.out.println("    " + "Bye. Hope to see you again soon!");
                 System.out.println("    ____________________________________________________________");
                 break;
+            } else if (command.equals("list")) {
+                System.out.println("    ____________________________________________________________");
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println("    " + (i + 1) + ". " + tasks[i]);
+                }
+                System.out.println("    ____________________________________________________________");
+            } else {
+                System.out.println("    ____________________________________________________________");
+                tasks[taskCount] = command;
+                taskCount++;
+                System.out.println("    added: " + command);
+                System.out.println("    ____________________________________________________________");
             }
-
-            System.out.println("    ____________________________________________________________");
-            System.out.println("    " + command);
-            System.out.println("    ____________________________________________________________");
         }
 
         scanner.close();
