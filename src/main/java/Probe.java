@@ -12,7 +12,7 @@ public class Probe {
     /** Reads and responds to commands until the user enters bye. */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String[] tasks = new String[100];
+        Task[] tasks = new Task[100];
         int taskCount = 0;
 
         System.out.println(BANNER);
@@ -30,13 +30,21 @@ public class Probe {
                 break;
             } else if (command.equals("list")) {
                 System.out.println("    ____________________________________________________________");
+                System.out.println("     Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    System.out.println("    " + (i + 1) + ". " + tasks[i]);
+                    Task t = tasks[i];
+                    System.out.println("     " + (i + 1) + ". [" + t.getStatusIcon() + "] "
+                            + t.getDescription());
                 }
                 System.out.println("    ____________________________________________________________");
+            } else if (command.startsWith("unmark ")) {
+                updateTask(tasks, taskCount, command, false);
+            } else if (command.startsWith("mark ")) {
+                updateTask(tasks, taskCount, command, true);
             } else {
                 System.out.println("    ____________________________________________________________");
-                tasks[taskCount] = command;
+                Task t = new Task(command);
+                tasks[taskCount] = t;
                 taskCount++;
                 System.out.println("    added: " + command);
                 System.out.println("    ____________________________________________________________");
@@ -44,5 +52,42 @@ public class Probe {
         }
 
         scanner.close();
+    }
+
+    /** Marks or unmarks a task after validating the requested task number. */
+    private static void updateTask(Task[] tasks, int taskCount,
+                                   String command, boolean markAsDone) {
+        String[] parts = command.split(" ");
+
+        if (parts.length != 2) {
+            System.out.println("Please provide a task number.");
+            return;
+        }
+
+        try {
+            int taskNumber = Integer.parseInt(parts[1]);
+
+            if (taskNumber < 1 || taskNumber > taskCount) {
+                System.out.println("That task number does not exist.");
+                return;
+            }
+
+            Task task = tasks[taskNumber - 1];
+
+            System.out.println("    ____________________________________________________________");
+            if (markAsDone) {
+                task.markAsDone();
+                System.out.println("    Nice! I've marked this task as done:");
+            } else {
+                task.markAsUndone();
+                System.out.println("    OK, I've marked this task as not done yet:");
+            }
+
+            System.out.println("       [" + task.getStatusIcon() + "] "
+                    + task.getDescription());
+            System.out.println("    ____________________________________________________________");
+        } catch (NumberFormatException e) {
+            System.out.println("The task number must be a number.");
+        }
     }
 }
