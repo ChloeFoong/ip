@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -100,13 +101,14 @@ public class Storage {
             if (parts[3].isBlank()) {
                 throw new IllegalArgumentException("Deadline date cannot be empty");
             }
-            task = new Deadline(description, parts[3]);
+            task = new Deadline(description, LocalDateTime.parse(parts[3]));
             break;
         case "E":
             if (parts[3].isBlank() || parts[4].isBlank()) {
                 throw new IllegalArgumentException("Event times cannot be empty");
             }
-            task = new Event(description, parts[3], parts[4]);
+            task = new Event(description, LocalDateTime.parse(parts[3]),
+                    LocalDateTime.parse(parts[4]));
             break;
         default:
             throw new IllegalArgumentException("Unknown task type: " + type);

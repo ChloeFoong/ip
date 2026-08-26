@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.time.LocalDateTime;
 
 public class Probe {
     private static final String FILE_PATH = "probe.txt";
@@ -86,7 +87,11 @@ public class Probe {
                 throw new ProbeException(
                         "A deadline must include a description and /by a date or time.");
             }
-            return new Deadline(parts[0], parts[1]);
+            try {
+                return new Deadline(parts[0], DateTimeParser.parse(parts[1]));
+            } catch (IllegalArgumentException e) {
+                throw new ProbeException(e.getMessage());
+            }
         }
 
         String content = command.substring(5).trim();
@@ -101,7 +106,16 @@ public class Probe {
             throw new ProbeException(
                     "An event must include /to and an ending date or time.");
         }
-        return new Event(parts[0], times[0], times[1]);
+        try {
+            LocalDateTime from = DateTimeParser.parse(times[0]);
+            LocalDateTime to = DateTimeParser.parse(times[1]);
+            if (to.isBefore(from)) {
+                throw new ProbeException("An event cannot end before it starts.");
+            }
+            return new Event(parts[0], from, to);
+        } catch (IllegalArgumentException e) {
+            throw new ProbeException(e.getMessage());
+        }
     }
 
     /** Displays confirmation after adding a task. */
