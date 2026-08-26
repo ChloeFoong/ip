@@ -1,3 +1,11 @@
+package probe;
+
+import probe.parser.Parser;
+import probe.storage.Storage;
+import probe.task.Task;
+import probe.task.TaskList;
+import probe.ui.Ui;
+
 public class Probe {
     private static final String FILE_PATH = "probe.txt";
     private final Storage storage;
