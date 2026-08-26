@@ -1,8 +1,9 @@
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
-/** Runs the Probe chatbot. */
 public class Probe {
+    private static final String FILE_PATH = "probe.txt";
     private static final String BANNER = "____________________________________________________________\n"
             + " ____  ____   ___  ____  _____\n"
             + "|  _ \\|  _ \\ / _ \\| __ )| ____|\n"
@@ -13,7 +14,9 @@ public class Probe {
     /** Reads and responds to commands until the user enters bye. */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
+        Storage storage = new Storage(FILE_PATH);
+        List<Task> taskList = storage.load();
+        ArrayList<Task> tasks = new ArrayList<>(taskList);
 
         System.out.println(BANNER);
         System.out.println("Hello! I'm Probe.");
@@ -43,20 +46,21 @@ public class Probe {
                 try {
                     Task task = createTask(command);
                     tasks.add(task);
+                    storage.save(tasks);
                     printAddedMessage(task, tasks.size());
                 } catch (ProbeException e) {
                     System.out.println(e.getMessage());
                 }
             } else if (command.startsWith("delete ")) {
                 try {
-                    deleteTask(tasks, command);
+                    deleteTask(tasks, command, storage);
                 } catch (ProbeException e) {
                     System.out.println(e.getMessage());
                 }
             } else if (command.startsWith("unmark ")) {
-                updateTask(tasks, tasks.size(), command, false);
+                updateTask(tasks, tasks.size(), command, false, storage);
             } else if (command.startsWith("mark ")) {
-                updateTask(tasks, tasks.size(), command, true);
+                updateTask(tasks, tasks.size(), command, true, storage);
             } else {
                 System.out.println("Invalid task type. Use todo, deadline, or event.");
             }
@@ -111,7 +115,7 @@ public class Probe {
 
     /** Marks or unmarks a task after validating the requested task number. */
     private static void updateTask(ArrayList<Task> tasks, int taskCount,
-                                   String command, boolean markAsDone) {
+            String command, boolean markAsDone, Storage storage) {
         String[] parts = command.split(" ");
 
         if (parts.length != 2) {
@@ -138,6 +142,8 @@ public class Probe {
                 System.out.println("    OK, I've marked this task as not done yet:");
             }
 
+            storage.save(tasks);
+
             System.out.println("       [" + task.getStatusIcon() + "] "
                     + task.getDescription());
             System.out.println("    ____________________________________________________________");
@@ -147,7 +153,7 @@ public class Probe {
     }
 
     /** Removes a task after validating its list number. */
-    private static void deleteTask(ArrayList<Task> tasks, String command)
+    private static void deleteTask(ArrayList<Task> tasks, String command, Storage storage)
             throws ProbeException {
         String[] parts = command.split(" ");
 
@@ -163,6 +169,9 @@ public class Probe {
             }
 
             Task removedTask = tasks.remove(taskNumber - 1);
+            
+            storage.save(tasks);
+
             System.out.println("    ____________________________________________________________");
             System.out.println("     Noted. I've removed this task:");
             System.out.println("       " + removedTask);
