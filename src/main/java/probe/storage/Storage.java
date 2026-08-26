@@ -1,3 +1,5 @@
+package probe.storage;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,6 +10,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import probe.task.Deadline;
+import probe.task.Event;
+import probe.task.Task;
+import probe.task.Todo;
 
 public class Storage {
     private final Path filePath;
