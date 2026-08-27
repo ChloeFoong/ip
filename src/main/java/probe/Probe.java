@@ -35,7 +35,10 @@ public class Probe {
         ui.showWelcome();
         while (true) {
             String command = ui.readCommand();
-            if (command.equals("bye")) { ui.showGoodbye(); break; }
+            if (command.equals("bye")) {
+                ui.showGoodbye();
+                break;
+            }
             try {
                 if (command.equals("list")) {
                     ui.showList(tasks.asList());
@@ -47,7 +50,8 @@ public class Probe {
                     ui.showAdded(task, tasks.size());
                 } else if (command.startsWith("delete ")) {
                     Task removed = tasks.delete(parser.parseNumber(command, "Please provide a task number to delete."));
-                    storage.save(tasks.asList()); ui.showRemoved(removed, tasks.size());
+                    storage.save(tasks.asList());
+                    ui.showRemoved(removed, tasks.size());
                 } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
                     boolean mark = command.startsWith("mark ");
                     Task task = tasks.get(parser.parseNumber(command, "Please provide a task number."));
@@ -57,6 +61,13 @@ public class Probe {
                         task.markAsUndone();
                     }
                     storage.save(tasks.asList()); ui.showUpdated(task, mark);
+                } else if (command.equals("find") || command.startsWith("find ")) {
+                    String keyword = command.length() > 4 ? command.substring(4).trim() : "";
+                    if (keyword.isBlank()) {
+                        throw new ProbeException("Enter some keyword to search.");
+                    }
+                    TaskList list = tasks.search(keyword);
+                    ui.showMatch(list.asList());
                 } else {
                     ui.showMessage("Invalid task type. Use todo, deadline, or event.");
                 }

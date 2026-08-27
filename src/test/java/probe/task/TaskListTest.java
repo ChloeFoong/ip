@@ -57,4 +57,36 @@ class TaskListTest {
         assertThrows(ProbeException.class, () -> taskList.delete(0));
         assertThrows(ProbeException.class, () -> taskList.delete(2));
     }
+
+    @Test
+    void searchReturnsTasksContainingKeyword() {
+        TaskList taskList = new TaskList(List.of(
+                new Todo("Read a book"),
+                new Todo("Write code"),
+                new Todo("Book a ticket")));
+
+        TaskList matches = taskList.search("book");
+
+        assertEquals(2, matches.size());
+        assertEquals("Read a book", matches.asList().get(0).getDescription());
+        assertEquals("Book a ticket", matches.asList().get(1).getDescription());
+    }
+
+    @Test
+    void searchIsCaseInsensitive() {
+        TaskList taskList = new TaskList(List.of(new Todo("Team Meeting")));
+
+        TaskList matches = taskList.search("meeting");
+
+        assertEquals(1, matches.size());
+    }
+
+    @Test
+    void searchReturnsEmptyListWhenThereAreNoMatches() {
+        TaskList taskList = new TaskList(List.of(new Todo("Read a book")));
+
+        TaskList matches = taskList.search("exercise");
+
+        assertEquals(0, matches.size());
+    }
 }

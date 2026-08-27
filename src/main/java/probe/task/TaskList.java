@@ -2,6 +2,7 @@ package probe.task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import probe.ProbeException;
 
 /**
@@ -86,5 +87,23 @@ public class TaskList {
         if (number < 1 || number > tasks.size()) {
             throw new ProbeException("That task number does not exist.");
         }
+    }
+
+    /**
+     * Returns tasks whose descriptions contain the specified keyword.
+     * Matching is case-insensitive.
+     *
+     * @param keyword Keyword to search for.
+     * @return New task list containing matching tasks.
+     */
+    public TaskList search(String keyword) {
+        TaskList list = new TaskList();
+        String searchKeyword = keyword.toLowerCase(Locale.ROOT);
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase(Locale.ROOT).contains(searchKeyword)) {
+                list.add(task);
+            }
+        }
+        return list;
     }
 }
