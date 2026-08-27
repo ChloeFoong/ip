@@ -7,7 +7,17 @@ import probe.task.Event;
 import probe.task.Task;
 import probe.task.Todo;
 
+/**
+ * Converts user commands into tasks and task numbers.
+ */
 public class Parser {
+    /**
+     * Returns a task parsed from a todo, deadline, or event command.
+     *
+     * @param command User command to parse.
+     * @return Parsed task.
+     * @throws ProbeException If the command is invalid.
+     */
     public Task parseTask(String command) throws ProbeException {
         if (command.startsWith("todo")) {
             String description = command.substring(4).trim();
@@ -31,6 +41,14 @@ public class Parser {
             return new Event(parts[0], from, to);
         } catch (IllegalArgumentException e) { throw new ProbeException(e.getMessage()); }
     }
+    /**
+     * Returns the integer task number extracted from a command.
+     *
+     * @param command Command containing the task number.
+     * @param error Error message for an incorrectly formatted command.
+     * @return Parsed task number.
+     * @throws ProbeException If the task number is invalid.
+     */
     public int parseNumber(String command, String error) throws ProbeException {
         String[] parts = command.split(" ");
         if (parts.length != 2) throw new ProbeException(error);

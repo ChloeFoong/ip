@@ -6,6 +6,9 @@ import probe.task.Task;
 import probe.task.TaskList;
 import probe.ui.Ui;
 
+/**
+ * Coordinates the user interface, parser, task list, and storage.
+ */
 public class Probe {
     private static final String FILE_PATH = "probe.txt";
     private final Storage storage;
@@ -13,11 +16,19 @@ public class Probe {
     private final Ui ui;
     private final Parser parser;
 
+    /**
+     * Creates an application using the specified task-storage file.
+     *
+     * @param filePath Path of the task-storage file.
+     */
     public Probe(String filePath) {
         ui = new Ui(); storage = new Storage(filePath); parser = new Parser();
         tasks = new TaskList(storage.load());
     }
 
+    /**
+     * Runs the command loop until the user enters {@code bye}.
+     */
     public void run() {
         ui.showWelcome();
         while (true) {
@@ -44,7 +55,12 @@ public class Probe {
         ui.close();
     }
 
-    public static void main(String[] args) { 
+    /**
+     * Starts the application using the default storage file.
+     *
+     * @param args Command-line arguments, which are not used.
+     */
+    public static void main(String[] args) {
         new Probe(FILE_PATH).run(); 
     }
 }

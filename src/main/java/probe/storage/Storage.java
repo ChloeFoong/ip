@@ -15,13 +15,26 @@ import probe.task.Event;
 import probe.task.Task;
 import probe.task.Todo;
 
+/**
+ * Loads tasks from and saves tasks to a local text file.
+ */
 public class Storage {
     private final Path filePath;
 
+    /**
+     * Creates storage backed by the specified file path.
+     *
+     * @param filePath Path of the storage file.
+     */
     public Storage(String filePath) {
         this.filePath = Paths.get(filePath);
     }
 
+    /**
+     * Returns valid tasks loaded from the file, skipping malformed lines.
+     *
+     * @return Tasks loaded from storage.
+     */
     public List<Task> load() {
         List<Task> tasks = new ArrayList<>();
         File file = filePath.toFile();
@@ -55,6 +68,11 @@ public class Storage {
         return tasks;
     }
 
+    /**
+     * Saves the supplied tasks, creating parent directories when needed.
+     *
+     * @param tasks Tasks to save.
+     */
     public void save(List<Task> tasks) {
         try {
             Path parentDir = filePath.getParent();
@@ -72,6 +90,13 @@ public class Storage {
         }
     }
 
+    /**
+     * Returns a task converted from one storage-format line.
+     *
+     * @param line Storage-format line to parse.
+     * @return Parsed task.
+     * @throws IllegalArgumentException If the line is malformed.
+     */
     private Task parseTask(String line) {
         String[] parts = line.split("\\s*\\|\\s*");
         if (parts.length < 2) {
