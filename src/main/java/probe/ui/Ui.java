@@ -21,7 +21,9 @@ public class Ui {
      *
      * @return Trimmed user command.
      */
-    public String readCommand() { return scanner.nextLine().trim(); }
+    public String readCommand() {
+        return scanner.nextLine().trim();
+    }
     /**
      * Displays the application welcome message.
      */
@@ -44,7 +46,9 @@ public class Ui {
      *
      * @param message Message to display.
      */
-    public void showMessage(String message) { System.out.println(message); }
+    public void showMessage(String message) {
+        System.out.println(message);
+    }
     /**
      * Displays all tasks with one-based numbering.
      *
@@ -53,7 +57,9 @@ public class Ui {
     public void showList(List<Task> tasks) {
         System.out.println(SEPARATOR);
         System.out.println("     Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) System.out.println("     " + (i + 1) + ". " + tasks.get(i));
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println("     " + (i + 1) + ". " + tasks.get(i));
+        }
         System.out.println(SEPARATOR);
     }
     /**
@@ -98,5 +104,7 @@ public class Ui {
     /**
      * Closes the standard-input scanner.
      */
-    public void close() { scanner.close(); }
+    public void close() {
+        scanner.close();
+    }
 }
