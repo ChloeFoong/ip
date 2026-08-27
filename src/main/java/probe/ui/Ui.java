@@ -101,6 +101,20 @@ public class Ui {
         System.out.println("       [" + task.getStatusIcon() + "] " + task.getDescription());
         System.out.println(SEPARATOR);
     }
+
+    /**
+     * Displays tasks matching a search query with one-based numbering.
+     *
+     * @param tasks Matching tasks to display.
+     */
+    public void showMatch(List<Task> tasks) {
+        System.out.println(SEPARATOR);
+        System.out.println("     Here are the matching tasks in your list:");
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println("     " + (i + 1) + ". " + tasks.get(i));
+        }
+        System.out.println(SEPARATOR);
+    }
     /**
      * Closes the standard-input scanner.
      */
