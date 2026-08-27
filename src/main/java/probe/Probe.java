@@ -22,7 +22,9 @@ public class Probe {
      * @param filePath Path of the task-storage file.
      */
     public Probe(String filePath) {
-        ui = new Ui(); storage = new Storage(filePath); parser = new Parser();
+        ui = new Ui();
+        storage = new Storage(filePath);
+        parser = new Parser();
         tasks = new TaskList(storage.load());
     }
 
@@ -37,20 +39,30 @@ public class Probe {
             try {
                 if (command.equals("list")) {
                     ui.showList(tasks.asList());
-                } else if (command.startsWith("todo") || command.startsWith("deadline") || command.startsWith("event")) {
-                    Task task = parser.parseTask(command); tasks.add(task); storage.save(tasks.asList()); ui.showAdded(task, tasks.size());
+                } else if (command.startsWith("todo") || command.startsWith("deadline")
+                        || command.startsWith("event")) {
+                    Task task = parser.parseTask(command);
+                    tasks.add(task);
+                    storage.save(tasks.asList());
+                    ui.showAdded(task, tasks.size());
                 } else if (command.startsWith("delete ")) {
                     Task removed = tasks.delete(parser.parseNumber(command, "Please provide a task number to delete."));
                     storage.save(tasks.asList()); ui.showRemoved(removed, tasks.size());
                 } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
                     boolean mark = command.startsWith("mark ");
                     Task task = tasks.get(parser.parseNumber(command, "Please provide a task number."));
-                    if (mark) task.markAsDone(); else task.markAsUndone();
+                    if (mark) {
+                        task.markAsDone();
+                    } else {
+                        task.markAsUndone();
+                    }
                     storage.save(tasks.asList()); ui.showUpdated(task, mark);
                 } else {
                     ui.showMessage("Invalid task type. Use todo, deadline, or event.");
                 }
-            } catch (ProbeException e) { ui.showMessage(e.getMessage()); }
+            } catch (ProbeException e) {
+                ui.showMessage(e.getMessage());
+            }
         }
         ui.close();
     }

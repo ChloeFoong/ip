@@ -61,7 +61,8 @@ public class TaskList {
      * @throws ProbeException If the task number is invalid.
      */
     public Task get(int number) throws ProbeException {
-        check(number); return tasks.get(number - 1); 
+        check(number);
+        return tasks.get(number - 1);
     }
 
     /**
@@ -72,7 +73,8 @@ public class TaskList {
      * @throws ProbeException If the task number is invalid.
      */
     public Task delete(int number) throws ProbeException {
-        check(number); return tasks.remove(number - 1); 
+        check(number);
+        return tasks.remove(number - 1);
     }
     /**
      * Validates that a one-based task number refers to an existing task.
@@ -81,6 +83,8 @@ public class TaskList {
      * @throws ProbeException If the task number is invalid.
      */
     private void check(int number) throws ProbeException {
-        if (number < 1 || number > tasks.size()) throw new ProbeException("That task number does not exist.");
+        if (number < 1 || number > tasks.size()) {
+            throw new ProbeException("That task number does not exist.");
+        }
     }
 }
