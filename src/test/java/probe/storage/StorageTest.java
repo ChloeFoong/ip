@@ -20,7 +20,7 @@ import probe.task.Todo;
 class StorageTest {
 
     @TempDir
-    Path temporaryDirectory;
+    private Path temporaryDirectory;
 
     @Test
     void loadReturnsEmptyListWhenFileDoesNotExist() {

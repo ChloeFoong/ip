@@ -17,7 +17,8 @@ public final class DateTimeParser {
     /**
      * Prevents instantiation of this utility class.
      */
-    private DateTimeParser() {}
+    private DateTimeParser() {
+    }
 
     /**
      * Returns the date/time parsed from a supported date or date/time string.

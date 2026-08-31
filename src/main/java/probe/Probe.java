@@ -60,7 +60,8 @@ public class Probe {
                     } else {
                         task.markAsUndone();
                     }
-                    storage.save(tasks.asList()); ui.showUpdated(task, mark);
+                    storage.save(tasks.asList());
+                    ui.showUpdated(task, mark);
                 } else if (command.equals("find") || command.startsWith("find ")) {
                     String keyword = command.length() > 4 ? command.substring(4).trim() : "";
                     if (keyword.isBlank()) {
