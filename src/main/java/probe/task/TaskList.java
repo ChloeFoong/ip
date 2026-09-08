@@ -104,13 +104,11 @@ public class TaskList {
      * @return New task list containing matching tasks.
      */
     public TaskList search(String keyword) {
-        TaskList list = new TaskList();
         String searchKeyword = keyword.toLowerCase(Locale.ROOT);
-        for (Task task : tasks) {
-            if (task.getDescription().toLowerCase(Locale.ROOT).contains(searchKeyword)) {
-                list.add(task);
-            }
-        }
-        return list;
+        List<Task> matchingTasks = tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase(Locale.ROOT)
+                        .contains(searchKeyword))
+                .toList();
+        return new TaskList(matchingTasks);
     }
 }
