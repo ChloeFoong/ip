@@ -1,5 +1,7 @@
 package probe.gui;
 
+import java.util.stream.IntStream;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -156,13 +158,8 @@ public class Main extends Application {
         if (taskItems.isEmpty()) {
             return "There are no matching tasks.";
         }
-        StringBuilder response = new StringBuilder();
-        for (int i = 0; i < taskItems.size(); i++) {
-            response.append(i + 1).append(". ").append(taskItems.get(i));
-            if (i < taskItems.size() - 1) {
-                response.append("\n");
-            }
-        }
-        return response.toString();
+        return IntStream.range(0, taskItems.size())
+                .mapToObj(index -> (index + 1) + ". " + taskItems.get(index))
+                .collect(java.util.stream.Collectors.joining("\n"));
     }
 }
