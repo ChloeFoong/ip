@@ -39,7 +39,8 @@ public class Deadline extends Task {
      */
     @Override
     public String toFileFormat() {
-        return String.format("D | %d | %s | %s", isDone ? 1 : 0, description,
-                DateTimeParser.formatForStorage(by));
+        String tagsText = tagsToFileFormat();
+        return String.format("D | %d | %s | %s%s", isDone ? 1 : 0, description,
+                DateTimeParser.formatForStorage(by), tagsText.isEmpty() ? "" : " | " + tagsText);
     }
 }

@@ -43,7 +43,9 @@ public class Event extends Task {
      */
     @Override
     public String toFileFormat() {
-        return String.format("E | %d | %s | %s | %s", isDone ? 1 : 0, description,
-                DateTimeParser.formatForStorage(from), DateTimeParser.formatForStorage(to));
+        String tagsText = tagsToFileFormat();
+        return String.format("E | %d | %s | %s | %s%s", isDone ? 1 : 0, description,
+                DateTimeParser.formatForStorage(from), DateTimeParser.formatForStorage(to),
+                tagsText.isEmpty() ? "" : " | " + tagsText);
     }
 }

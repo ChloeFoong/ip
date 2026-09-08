@@ -119,16 +119,16 @@ public class Storage {
             throw new IllegalArgumentException("Invalid completion status: " + parts[1]);
         }
 
-        int expectedFields = switch (type) {
+        int baseFields = switch (type) {
             case TODO_TYPE -> 3;
             case DEADLINE_TYPE -> 4;
             case EVENT_TYPE -> 5;
             default -> throw new IllegalArgumentException("Unknown task type: " + type);
         };
-        if (parts.length != expectedFields) {
+        if (parts.length != baseFields && parts.length != baseFields + 1) {
             throw new IllegalArgumentException("Invalid number of fields for task type " + type);
         }
-        assert parts.length == expectedFields
+        assert parts.length == baseFields || parts.length == baseFields + 1
                 : "A validated storage record must have the expected number of fields";
 
         boolean isDone = parts[1].equals(COMPLETE_STATUS);
@@ -161,6 +161,10 @@ public class Storage {
 
         if (isDone) {
             task.markAsDone();
+        }
+        if (parts.length == baseFields + 1) {
+            String[] savedTags = parts[baseFields].split(",");
+            task.addTag(savedTags);
         }
         assert task != null : "A recognized task type must produce a task";
         return task;
