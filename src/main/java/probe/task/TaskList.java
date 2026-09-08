@@ -64,7 +64,9 @@ public class TaskList {
      */
     public Task get(int number) throws ProbeException {
         validateTaskNumber(number);
-        return tasks.get(number - 1);
+        Task task = tasks.get(number - 1);
+        assert task != null : "A valid task number must refer to a task";
+        return task;
     }
 
     /**
@@ -76,7 +78,9 @@ public class TaskList {
      */
     public Task delete(int number) throws ProbeException {
         validateTaskNumber(number);
-        return tasks.remove(number - 1);
+        Task removedTask = tasks.remove(number - 1);
+        assert removedTask != null : "A valid task number must refer to a task";
+        return removedTask;
     }
     /**
      * Validates that a one-based task number refers to an existing task.
@@ -88,6 +92,8 @@ public class TaskList {
         if (number < 1 || number > tasks.size()) {
             throw new ProbeException("That task number does not exist.");
         }
+        assert number >= 1 && number <= tasks.size()
+                : "Task number validation must establish a valid one-based index";
     }
 
     /**

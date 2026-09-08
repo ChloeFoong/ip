@@ -52,6 +52,7 @@ public class Parser {
             if (to.isBefore(from)) {
                 throw new ProbeException("An event cannot end before it starts.");
             }
+            assert !to.isBefore(from) : "An event must end at or after its start";
             return new Event(parts[0], from, to);
         } catch (IllegalArgumentException e) {
             throw new ProbeException(e.getMessage());
