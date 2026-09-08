@@ -47,7 +47,9 @@ public final class DateTimeParser {
      * @return Display-formatted date/time.
      */
     public static String formatForDisplay(LocalDateTime value) {
-        return value.format(DISPLAY_FORMAT);
+        return value.format(DISPLAY_FORMAT)
+                .replace("AM", "am")
+                .replace("PM", "pm");
     }
 
     /**
