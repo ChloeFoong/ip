@@ -20,6 +20,11 @@ import probe.task.Todo;
  * Loads tasks from and saves tasks to a local text file.
  */
 public class Storage {
+    private static final String TODO_TYPE = "T";
+    private static final String DEADLINE_TYPE = "D";
+    private static final String EVENT_TYPE = "E";
+    private static final String INCOMPLETE_STATUS = "0";
+    private static final String COMPLETE_STATUS = "1";
     private final Path filePath;
 
     /**
@@ -105,22 +110,28 @@ public class Storage {
         }
 
         String type = parts[0];
-        if (!type.equals("T") && !type.equals("D") && !type.equals("E")) {
+        if (!type.equals(TODO_TYPE) && !type.equals(DEADLINE_TYPE)
+                && !type.equals(EVENT_TYPE)) {
             throw new IllegalArgumentException("Unknown task type: " + type);
         }
 
-        if (!parts[1].equals("0") && !parts[1].equals("1")) {
+        if (!parts[1].equals(INCOMPLETE_STATUS) && !parts[1].equals(COMPLETE_STATUS)) {
             throw new IllegalArgumentException("Invalid completion status: " + parts[1]);
         }
 
-        int expectedFields = type.equals("T") ? 3 : type.equals("D") ? 4 : 5;
+        int expectedFields = switch (type) {
+            case TODO_TYPE -> 3;
+            case DEADLINE_TYPE -> 4;
+            case EVENT_TYPE -> 5;
+            default -> throw new IllegalArgumentException("Unknown task type: " + type);
+        };
         if (parts.length != expectedFields) {
             throw new IllegalArgumentException("Invalid number of fields for task type " + type);
         }
         assert parts.length == expectedFields
                 : "A validated storage record must have the expected number of fields";
 
-        boolean isDone = parts[1].equals("1");
+        boolean isDone = parts[1].equals(COMPLETE_STATUS);
         String description = parts[2];
         if (description.isBlank()) {
             throw new IllegalArgumentException("Task description cannot be empty");
@@ -128,16 +139,16 @@ public class Storage {
 
         Task task;
         switch (type) {
-            case "T":
+            case TODO_TYPE:
                 task = new Todo(description);
                 break;
-            case "D":
+            case DEADLINE_TYPE:
                 if (parts[3].isBlank()) {
                     throw new IllegalArgumentException("Deadline date cannot be empty");
                 }
                 task = new Deadline(description, LocalDateTime.parse(parts[3]));
                 break;
-            case "E":
+            case EVENT_TYPE:
                 if (parts[3].isBlank() || parts[4].isBlank()) {
                     throw new IllegalArgumentException("Event times cannot be empty");
                 }
