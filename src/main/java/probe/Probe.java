@@ -1,8 +1,8 @@
 package probe;
 
+import probe.handler.CommandHandler;
 import probe.parser.Parser;
 import probe.storage.Storage;
-import probe.task.Task;
 import probe.task.TaskList;
 import probe.ui.Ui;
 
@@ -15,6 +15,7 @@ public class Probe {
     private final TaskList tasks;
     private final Ui ui;
     private final Parser parser;
+    private final CommandHandler commandHandler;
 
     /**
      * Creates an application using the specified task-storage file.
@@ -26,6 +27,7 @@ public class Probe {
         storage = new Storage(filePath);
         parser = new Parser();
         tasks = new TaskList(storage.load());
+        commandHandler = new CommandHandler(storage, tasks, parser);
     }
 
     /**
@@ -40,38 +42,7 @@ public class Probe {
                 break;
             }
             try {
-                if (command.equals("list")) {
-                    ui.showList(tasks.asList());
-                } else if (command.startsWith("todo") || command.startsWith("deadline")
-                        || command.startsWith("event")) {
-                    Task task = parser.parseTask(command);
-                    tasks.add(task);
-                    storage.save(tasks.asList());
-                    ui.showAdded(task, tasks.size());
-                } else if (command.startsWith("delete ")) {
-                    Task removed = tasks.delete(parser.parseNumber(command, "Please provide a task number to delete."));
-                    storage.save(tasks.asList());
-                    ui.showRemoved(removed, tasks.size());
-                } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
-                    boolean isMark = command.startsWith("mark ");
-                    Task task = tasks.get(parser.parseNumber(command, "Please provide a task number."));
-                    if (isMark) {
-                        task.markAsDone();
-                    } else {
-                        task.markAsUndone();
-                    }
-                    storage.save(tasks.asList());
-                    ui.showUpdated(task, isMark);
-                } else if (command.equals("find") || command.startsWith("find ")) {
-                    String keyword = command.length() > 4 ? command.substring(4).trim() : "";
-                    if (keyword.isBlank()) {
-                        throw new ProbeException("Enter some keyword to search.");
-                    }
-                    TaskList list = tasks.search(keyword);
-                    ui.showMatches(list.asList());
-                } else {
-                    ui.showMessage("Invalid task type. Use todo, deadline, or event.");
-                }
+                ui.showMessage(commandHandler.execute(command));
             } catch (ProbeException e) {
                 ui.showMessage(e.getMessage());
             }
