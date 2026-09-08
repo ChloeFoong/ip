@@ -10,7 +10,7 @@ import probe.ui.Ui;
  * Coordinates the user interface, parser, task list, and storage.
  */
 public class Probe {
-    private static final String FILE_PATH = "probe.txt";
+    private static final String DEFAULT_TASK_FILE_PATH = "probe.txt";
     private final Storage storage;
     private final TaskList tasks;
     private final Ui ui;
@@ -53,22 +53,22 @@ public class Probe {
                     storage.save(tasks.asList());
                     ui.showRemoved(removed, tasks.size());
                 } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
-                    boolean mark = command.startsWith("mark ");
+                    boolean isMark = command.startsWith("mark ");
                     Task task = tasks.get(parser.parseNumber(command, "Please provide a task number."));
-                    if (mark) {
+                    if (isMark) {
                         task.markAsDone();
                     } else {
                         task.markAsUndone();
                     }
                     storage.save(tasks.asList());
-                    ui.showUpdated(task, mark);
+                    ui.showUpdated(task, isMark);
                 } else if (command.equals("find") || command.startsWith("find ")) {
                     String keyword = command.length() > 4 ? command.substring(4).trim() : "";
                     if (keyword.isBlank()) {
                         throw new ProbeException("Enter some keyword to search.");
                     }
                     TaskList list = tasks.search(keyword);
-                    ui.showMatch(list.asList());
+                    ui.showMatches(list.asList());
                 } else {
                     ui.showMessage("Invalid task type. Use todo, deadline, or event.");
                 }
@@ -85,6 +85,6 @@ public class Probe {
      * @param args Command-line arguments, which are not used.
      */
     public static void main(String[] args) {
-        new Probe(FILE_PATH).run(); 
+        new Probe(DEFAULT_TASK_FILE_PATH).run(); 
     }
 }

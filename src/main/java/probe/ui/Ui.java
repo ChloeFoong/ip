@@ -108,7 +108,7 @@ public class Ui {
      *
      * @param tasks Matching tasks to display.
      */
-    public void showMatch(List<Task> tasks) {
+    public void showMatches(List<Task> tasks) {
         System.out.println(SEPARATOR);
         System.out.println("     Here are the matching tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {

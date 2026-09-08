@@ -95,16 +95,16 @@ public class Main extends Application {
             storage.save(tasks.asList());
             return "Removed: " + removed;
         } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
-            boolean marked = command.startsWith("mark ");
+            boolean isMarked = command.startsWith("mark ");
             int number = parser.parseNumber(command, "Please provide a task number.");
             Task task = tasks.get(number);
-            if (marked) {
+            if (isMarked) {
                 task.markAsDone();
             } else {
                 task.markAsUndone();
             }
             storage.save(tasks.asList());
-            return marked ? "Marked as done: " + task : "Marked as not done: " + task;
+            return isMarked ? "Marked as done: " + task : "Marked as not done: " + task;
         } else if (command.startsWith("find ")) {
             String keyword = command.substring(4).trim();
             if (keyword.isBlank()) {

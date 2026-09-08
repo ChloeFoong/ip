@@ -59,7 +59,7 @@ public class Storage {
                     tasks.add(task);
                 } catch (IllegalArgumentException e) {
                     System.out.println("Warning: Corrupted data at line " + lineNumber 
-                        + " (" + e.getMessage() + "). Skipping line.");
+                            + " (" + e.getMessage() + "). Skipping line.");
                 }
             }
         } catch (IOException e) {
@@ -126,24 +126,24 @@ public class Storage {
 
         Task task;
         switch (type) {
-        case "T":
-            task = new Todo(description);
-            break;
-        case "D":
-            if (parts[3].isBlank()) {
-                throw new IllegalArgumentException("Deadline date cannot be empty");
-            }
-            task = new Deadline(description, LocalDateTime.parse(parts[3]));
-            break;
-        case "E":
-            if (parts[3].isBlank() || parts[4].isBlank()) {
-                throw new IllegalArgumentException("Event times cannot be empty");
-            }
-            task = new Event(description, LocalDateTime.parse(parts[3]),
-                    LocalDateTime.parse(parts[4]));
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown task type: " + type);
+            case "T":
+                task = new Todo(description);
+                break;
+            case "D":
+                if (parts[3].isBlank()) {
+                    throw new IllegalArgumentException("Deadline date cannot be empty");
+                }
+                task = new Deadline(description, LocalDateTime.parse(parts[3]));
+                break;
+            case "E":
+                if (parts[3].isBlank() || parts[4].isBlank()) {
+                    throw new IllegalArgumentException("Event times cannot be empty");
+                }
+                task = new Event(description, LocalDateTime.parse(parts[3]),
+                        LocalDateTime.parse(parts[4]));
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown task type: " + type);
         }
 
         if (isDone) {
