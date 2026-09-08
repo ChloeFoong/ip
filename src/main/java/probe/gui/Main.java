@@ -13,9 +13,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import probe.ProbeException;
+import probe.handler.CommandHandler;
 import probe.parser.Parser;
 import probe.storage.Storage;
-import probe.task.Task;
 import probe.task.TaskList;
 
 /**
@@ -26,6 +26,7 @@ public class Main extends Application {
     private final Parser parser = new Parser();
     private final Storage storage = new Storage(FILE_PATH);
     private final TaskList tasks = new TaskList(storage.load());
+    private final CommandHandler commandHandler = new CommandHandler(storage, tasks, parser);
     private final VBox dialogContainer = new VBox(8);
     private final ScrollPane scrollPane = new ScrollPane(dialogContainer);
     private TextField userInput;
@@ -69,52 +70,10 @@ public class Main extends Application {
             return;
         }
         try {
-            addProbeMessage(executeCommand(command));
+            addProbeMessage(commandHandler.execute(command));
         } catch (ProbeException exception) {
             addProbeMessage(exception.getMessage());
         }
-    }
-
-    /**
-     * Returns the response produced by executing a user command.
-     *
-     * @param command User command to execute.
-     * @return Response to display in the chat.
-     * @throws ProbeException If the command is invalid.
-     */
-    private String executeCommand(String command) throws ProbeException {
-        if (command.equals("list")) {
-            return formatTasks(tasks.asList());
-        } else if (command.startsWith("todo") || command.startsWith("deadline")
-                || command.startsWith("event")) {
-            Task task = parser.parseTask(command);
-            tasks.add(task);
-            storage.save(tasks.asList());
-            return "Added: " + task;
-        } else if (command.startsWith("delete ")) {
-            int number = parser.parseNumber(command, "Please provide a task number to delete.");
-            Task removed = tasks.delete(number);
-            storage.save(tasks.asList());
-            return "Removed: " + removed;
-        } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
-            boolean isMarked = command.startsWith("mark ");
-            int number = parser.parseNumber(command, "Please provide a task number.");
-            Task task = tasks.get(number);
-            if (isMarked) {
-                task.markAsDone();
-            } else {
-                task.markAsUndone();
-            }
-            storage.save(tasks.asList());
-            return isMarked ? "Marked as done: " + task : "Marked as not done: " + task;
-        } else if (command.startsWith("find ")) {
-            String keyword = command.substring(4).trim();
-            if (keyword.isBlank()) {
-                throw new ProbeException("Enter some keyword to search.");
-            }
-            return formatTasks(tasks.search(keyword).asList());
-        }
-        throw new ProbeException("I do not understand that command.");
     }
 
     /**
@@ -151,15 +110,4 @@ public class Main extends Application {
         scrollPane.setVvalue(1.0);
     }
 
-    /**
-     * Returns a readable response containing the supplied tasks.
-     */
-    private String formatTasks(java.util.List<Task> taskItems) {
-        if (taskItems.isEmpty()) {
-            return "There are no matching tasks.";
-        }
-        return IntStream.range(0, taskItems.size())
-                .mapToObj(index -> (index + 1) + ". " + taskItems.get(index))
-                .collect(java.util.stream.Collectors.joining("\n"));
-    }
 }
