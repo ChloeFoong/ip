@@ -117,6 +117,8 @@ public class Storage {
         if (parts.length != expectedFields) {
             throw new IllegalArgumentException("Invalid number of fields for task type " + type);
         }
+        assert parts.length == expectedFields
+                : "A validated storage record must have the expected number of fields";
 
         boolean isDone = parts[1].equals("1");
         String description = parts[2];
@@ -149,6 +151,7 @@ public class Storage {
         if (isDone) {
             task.markAsDone();
         }
+        assert task != null : "A recognized task type must produce a task";
         return task;
     }
 }
