@@ -44,6 +44,10 @@ public class CommandHandler {
             return deleteTask(command);
         } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
             return updateTaskStatus(command);
+        } else if (command.equals("tag clear")) {
+            return clearTags();
+        } else if (command.startsWith("tag ") || command.startsWith("untag ")) {
+            return updateTags(command);
         } else if (command.equals("find") || command.startsWith("find ")) {
             return findTasks(command);
         } else {
@@ -107,6 +111,49 @@ public class CommandHandler {
             throw new ProbeException("Enter some keyword to search.");
         }
         return formatTasks(tasks.search(keyword).asList());
+    }
+
+    /**
+     * Adds or removes the tags specified by a command.
+     *
+     * @param command Tag or untag command.
+     * @return Response describing the tag update.
+     * @throws ProbeException If the command format or task number is invalid.
+     */
+    private String updateTags(String command) throws ProbeException {
+        String[] parts = command.trim().split("\\s+");
+        if (parts.length < 3) {
+            throw new ProbeException("Please provide a task number and at least one tag.");
+        }
+        int taskNumber;
+        try {
+            taskNumber = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException exception) {
+            throw new ProbeException("The task number must be a number.");
+        }
+        Task task = tasks.get(taskNumber);
+        String[] tagNames = java.util.Arrays.copyOfRange(parts, 2, parts.length);
+        boolean adding = parts[0].equals("tag");
+        if (adding) {
+            task.addTag(tagNames);
+        } else {
+            task.deleteTag(tagNames);
+        }
+        storage.save(tasks.asList());
+        return (adding ? "Updated tags: " : "Removed tags: ") + task;
+    }
+
+    /**
+     * Removes all tags from every task and persists the updated list.
+     *
+     * @return Response confirming that all tags were removed.
+     */
+    private String clearTags() {
+        for (Task task : tasks.asList()) {
+            task.clearTags();
+        }
+        storage.save(tasks.asList());
+        return "Cleared all tags.";
     }
 
     /**
