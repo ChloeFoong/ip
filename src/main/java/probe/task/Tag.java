@@ -18,8 +18,9 @@ public final class Tag {
         if (normalizedName.startsWith("#")) {
             normalizedName = normalizedName.substring(1);
         }
-        if (normalizedName.isBlank()) {
-            throw new IllegalArgumentException("Tag name cannot be empty.");
+        if (!normalizedName.matches("[A-Za-z0-9_-]+")) {
+            throw new IllegalArgumentException(
+                    "Tag names may contain only letters, numbers, underscores, and hyphens.");
         }
         this.name = normalizedName;
     }

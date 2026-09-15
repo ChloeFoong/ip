@@ -67,7 +67,7 @@ public class Storage {
                             + " (" + e.getMessage() + "). Skipping line.");
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | SecurityException e) {
             System.out.println("Error reading file: " + e.getMessage());
         }
 
@@ -91,7 +91,7 @@ public class Storage {
                     writer.write(task.toFileFormat() + System.lineSeparator());
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | SecurityException e) {
             System.out.println("Error saving tasks to disk: " + e.getMessage());
         }
     }
