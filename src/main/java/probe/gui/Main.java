@@ -44,6 +44,9 @@ public class Main extends Application {
 
         AnchorPane mainLayout = new AnchorPane(scrollPane, userInput, sendButton);
         configureLayout(mainLayout, sendButton);
+        mainLayout.setStyle("-fx-background-color: #f8fafc;");
+        userInput.setStyle("-fx-font-size: 14px; -fx-background-radius: 8;");
+        sendButton.setStyle("-fx-font-weight: bold; -fx-background-radius: 8;");
         addProbeMessage("Hello! I'm Probe. How can I help you?");
         stage.setTitle("Probe");
         stage.setMinWidth(400);
@@ -70,7 +73,7 @@ public class Main extends Application {
         try {
             addProbeMessage(commandHandler.execute(command));
         } catch (ProbeException exception) {
-            addProbeMessage(exception.getMessage());
+            addErrorMessage(exception.getMessage());
         }
     }
 
@@ -79,8 +82,11 @@ public class Main extends Application {
      */
     private void configureLayout(AnchorPane mainLayout, Button sendButton) {
         scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background: #f8fafc; -fx-background-color: #f8fafc;");
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        dialogContainer.setPadding(new Insets(10));
+        dialogContainer.setFillWidth(true);
+        dialogContainer.setPadding(new Insets(12, 10, 12, 10));
+        dialogContainer.setStyle("-fx-background-color: #f8fafc;");
         AnchorPane.setTopAnchor(scrollPane, 0.0);
         AnchorPane.setLeftAnchor(scrollPane, 0.0);
         AnchorPane.setRightAnchor(scrollPane, 0.0);
@@ -105,6 +111,16 @@ public class Main extends Application {
      */
     private void addProbeMessage(String message) {
         dialogContainer.getChildren().add(new DialogBox("Probe", message, false));
+        scrollPane.setVvalue(1.0);
+    }
+
+    /**
+     * Adds an error response with visually distinct styling.
+     *
+     * @param message Error message to display.
+     */
+    private void addErrorMessage(String message) {
+        dialogContainer.getChildren().add(new DialogBox("Probe • Error", message, false, true));
         scrollPane.setVvalue(1.0);
     }
 
