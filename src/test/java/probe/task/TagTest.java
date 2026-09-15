@@ -32,6 +32,16 @@ class TagTest {
     }
 
     @Test
+    void specialCharactersInTagNameAreRejected() {
+        assertThrows(IllegalArgumentException.class, () -> new Tag("#fun!"));
+    }
+
+    @Test
+    void tagsWithSameNameAreEqual() {
+        assertEquals(new Tag("#fun"), new Tag("fun"));
+    }
+
+    @Test
     void clearTagsRemovesAllTags() {
         Todo todo = new Todo("Read a book");
         todo.addTag("fun", "weekend");

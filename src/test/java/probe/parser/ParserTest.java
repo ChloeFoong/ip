@@ -59,6 +59,24 @@ class ParserTest {
     }
 
     @Test
+    void rejectsEventWithEqualStartAndEndTimes() {
+        assertThrows(ProbeException.class, () -> parser.parseTask(
+                "event meeting /from 28/8/2026 1100 /to 28/8/2026 1100"));
+    }
+
+    @Test
+    void acceptsExtraWhitespaceBetweenArguments() throws ProbeException {
+        Task task = parser.parseTask("  todo   read a book  ");
+
+        assertEquals("read a book", task.getDescription());
+    }
+
+    @Test
+    void rejectsUnknownTaskType() {
+        assertThrows(ProbeException.class, () -> parser.parseTask("reminder read a book"));
+    }
+
+    @Test
     void parsesTaskNumber() throws ProbeException {
         assertEquals(3, parser.parseNumber("delete 3", "Invalid command"));
     }

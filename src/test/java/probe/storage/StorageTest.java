@@ -62,6 +62,20 @@ class StorageTest {
     }
 
     @Test
+    void saveAndLoadPreservesTags() {
+        Path file = temporaryDirectory.resolve("tagged-tasks.txt");
+        Storage storage = new Storage(file.toString());
+        Todo todo = new Todo("Read a book");
+        todo.addTag("fun", "weekend");
+
+        storage.save(List.of(todo));
+
+        List<Task> loadedTasks = storage.load();
+
+        assertEquals("[T][ ] Read a book #fun #weekend", loadedTasks.get(0).toString());
+    }
+
+    @Test
     void loadSkipsMalformedLines() throws Exception {
         Path file = temporaryDirectory.resolve("tasks.txt");
         Files.writeString(
