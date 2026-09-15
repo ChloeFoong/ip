@@ -70,6 +70,9 @@ jar {
 
 shadowJar {
     archiveFileName = 'probe.jar'
+    manifest {
+        attributes 'Main-Class': 'probe.gui.Launcher'
+    }
 }
 
 run {
